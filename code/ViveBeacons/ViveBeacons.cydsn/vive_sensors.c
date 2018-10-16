@@ -131,13 +131,17 @@ VIVE_sensors_data* VIVE_sensors_process_pulses(VIVE_sensors *vive_sensors) {
     uint8_t data = 0;
     uint8_t axis = 0;
     
+    //TODO make an init function
     VIVE_sensors_data* vive_sensors_data = (VIVE_sensors_data *) malloc(1*sizeof(VIVE_sensors_data));
+    for (int i = 0; i < 8; i++) vive_sensors_data->angles[i] = ANGLE_invalid_value; //init
+    vive_sensors_data->skip = 0;
+    vive_sensors_data->data = 0;
+    vive_sensors_data->axis = 0;
     
     uint8_t timing_readable_reg_value = timing_readable_Read();
     
     // For each sensor
     for(int i = 0; i < 8; i++) {
-        vive_sensors_data->angles[i] = ANGLE_invalid_value;
 
         if(vive_sensors->usable[i]){
             
