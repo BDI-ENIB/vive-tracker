@@ -36,37 +36,38 @@ TS4231_driver* TS4231_driver_create(uint32_t enveloppe_pin, uint32_t data_pin) {
     return ts4231_driver;
 }
 
-void TS4231_driver_init(TS4231_driver* ts4231_driver) {
+bool TS4231_driver_init(TS4231_driver* ts4231_driver) {
     Status status = UNKNOWN;
     bool exit = false;
     
-    TS4231_driver_wait_for_light(ts4231_driver);
-    
-    do {
-        status = TS4231_driver_configure(ts4231_driver, DEFAULT_CONFIGURATION_VALUE);
+    if (TS4231_driver_wait_for_light(ts4231_driver)){ //false if timed out
         
-        if(status == UNKNOWN || status == BUS_FAIL)
-            continue;
-        else if(status == VERIFY_FAIL) {
-            uint16_t readback = TS4231_driver_read_configuration(ts4231_driver);
+        do {
+            status = TS4231_driver_configure(ts4231_driver, DEFAULT_CONFIGURATION_VALUE);
             
-            if(readback == DEFAULT_CONFIGURATION_VALUE)
+            if(status == UNKNOWN || status == BUS_FAIL)
+                continue;
+            else if(status == VERIFY_FAIL) {
+                uint16_t readback = TS4231_driver_read_configuration(ts4231_driver);
+                
+                if(readback == DEFAULT_CONFIGURATION_VALUE)
+                    exit = true;
+                else
+                    continue;
+            }
+            else if(status == WATCH_FAIL) {
+                //gné
+            }
+            else if(status == CONFIG_PASS)
                 exit = true;
             else
                 continue;
-        }
-        else if(status == WATCH_FAIL) {
             
         }
-        else if(status == CONFIG_PASS)
-            exit = true;
-        else
-            continue;
-        
+        while(!exit);
+        return true;
     }
-    while(!exit);
-    
-    
+    return false;
 }
 
 bool TS4231_driver_go_to_sleep(TS4231_driver* ts4231_driver) {
@@ -182,28 +183,28 @@ void TS4231_driver_delete(TS4231_driver* ts4231_driver) {
 */
 
 /*
-    Function that wait until light is detected on the TS4231. There's no timeout.
+    Function that wait until light is detected on the TS4231. There's is a timeout
 */
 
-void TS4231_driver_wait_for_light(TS4231_driver* ts4231_driver) {
-    bool light = false;
-    bool exit = false;
-    unsigned long time0;
+bool TS4231_driver_wait_for_light(TS4231_driver* ts4231_driver) {
+    millis_timer_Init(); //resetting the timer
+    uint16_t time0 = millis_timer_ReadCounter();
     
     if (TS4231_driver_check_bus(ts4231_driver) == S0) {
-        while (exit == false) {
-            if (CyPins_ReadPin(ts4231_driver->data_pin) != 0) {
-                while (exit == false) {
+        while (true) {
+            time0 = millis_timer_ReadCounter();
+            if (time0 == TIMEOUT_LENGHT) { return false; } //waited for too long
+            if (CyPins_ReadPin(ts4231_driver->data_pin) != 0) { //light detected
+                while (true) {
+                    if (time0 == TIMEOUT_LENGHT) { return false; } //waited for too long
                     if (CyPins_ReadPin(ts4231_driver->data_pin) == 0) {
-                        exit = true;
-                        light = true;
+                       return true;
                     }
                 }
             }
         }
     }
-    else
-        light = true;  //if not in state S0, light has already been detected
+    else return true;  //if not in state S0, light has already been detected
 }
 
 Status TS4231_driver_configure(TS4231_driver* ts4231_driver, uint16_t configuration_value) {

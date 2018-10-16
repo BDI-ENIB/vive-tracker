@@ -23,6 +23,8 @@
 #define SLEEP_RECOVERY 100 // in microseconds
 
 #define DEFAULT_CONFIGURATION_VALUE 0x392B
+    
+#define TIMEOUT_LENGHT 1000
 
 // Enums
 typedef enum State State;
@@ -41,13 +43,13 @@ struct TS4231_driver {
 
 // Public methods
 TS4231_driver* TS4231_driver_create(uint32_t enveloppe_pin, uint32_t data_pin);
-void TS4231_driver_init(TS4231_driver* ts4231_driver);
+bool TS4231_driver_init(TS4231_driver* ts4231_driver);
 bool TS4231_driver_go_to_watch(TS4231_driver* ts4231_driver);
 bool TS4231_driver_go_to_sleep(TS4231_driver* ts4231_driver);
 void TS4231_driver_delete(TS4231_driver* ts4231_driver);
 
 // Private methods
-void TS4231_driver_wait_for_light(TS4231_driver* ts4231_driver);
+bool TS4231_driver_wait_for_light(TS4231_driver* ts4231_driver);
 Status TS4231_driver_configure(TS4231_driver* ts4231_driver, uint16_t configuration_value);
 State TS4231_driver_check_bus(TS4231_driver* ts4231_driver);
 void TS4231_driver_write_configuration(TS4231_driver* ts4231_driver, uint16_t configuration_value);

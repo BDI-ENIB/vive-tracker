@@ -45,6 +45,7 @@ typedef struct VIVE_sensors VIVE_sensors;
 struct VIVE_sensors {
     // TS4231_drivers
     TS4231_driver* ts4231_drivers[8];
+    bool usable[8];
     
     // Variable declarations for DMA_timing_read
     uint8 DMA_timing_read_Chan;
@@ -74,6 +75,7 @@ volatile bool VIVE_pulses_decoded;
 VIVE_sensors* VIVE_sensors_create();
 void VIVE_sensors_init(VIVE_sensors *vive_sensors);
 VIVE_sensors_data* VIVE_sensors_process_pulses(VIVE_sensors *vive_sensors);
+//TODO make an init function for sensors_data
 
 // Interrupt Service Routines
 CY_ISR_PROTO(isr_timing_read);

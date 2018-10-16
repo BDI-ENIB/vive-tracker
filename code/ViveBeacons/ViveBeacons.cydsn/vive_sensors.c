@@ -23,7 +23,7 @@
 /*
     ---------------------------------------------------------------------------
     Name : Create
-    Description : Create an VIVE sensors "object".
+    Description : Create a VIVE sensors "object".
     ---------------------------------------------------------------------------
 */
 
@@ -97,8 +97,13 @@ void VIVE_sensors_init(VIVE_sensors *vive_sensors) {
     CyDmaChEnable(vive_sensors->DMA_timing_read_Chan, 1);
 
     // --- TS4231 drivers init ---
-    for(int i = 0; i < 8; i+=2)
-        TS4231_driver_init(vive_sensors->ts4231_drivers[i]);
+    for(int i = 0; i < 8; i++) {
+       
+        if( TS4231_driver_init(vive_sensors->ts4231_drivers[i])) { //timed-out
+            vive_sensors->usable[i] = true;
+        }
+        else vive_sensors->usable[i] = false; 
+    }
 
     // --- Start interrupt ---
     isr_timing_redirect_StartEx(isr_timing_read);
@@ -133,26 +138,29 @@ VIVE_sensors_data* VIVE_sensors_process_pulses(VIVE_sensors *vive_sensors) {
     // For each sensor
     for(int i = 0; i < 8; i++) {
         vive_sensors_data->angles[i] = ANGLE_invalid_value;
-        
-        bool timing_readable_bit = (timing_readable_reg_value & (1 << i)) >> i;
-        if(timing_readable_bit) { // If it's readable
-            // sync pulse decoding : voting
-            uint8_t sync_pulse = (vive_sensors->sync_pulses[i] - 375) / 75;
-            axis += (sync_pulse & (1 << 0)) >> 0;
-            data += (sync_pulse & (1 << 1)) >> 1;
-            skip += (sync_pulse & (1 << 2)) >> 2;
-            nb_votes++;
+
+        if(vive_sensors->usable[i]){
             
-            // get the timing
-            uint16_t timing = vive_sensors->timing[i];
-            
-            // get rid of invalid angle
-            if(timing>TIMING_angle_max_tick || timing<TIMING_angle_min_tick)
-                continue;
-            
-            // convert timing to angles
-            vive_sensors_data->angles[i] = CY_M_PI*(((double) (timing)-TIMING_angle_center_tick)/(TIMING_cycle_max_tick*1.0));
-        }
+            bool timing_readable_bit = (timing_readable_reg_value & (1 << i)) >> i;
+            if(timing_readable_bit) { // If it's readable
+                // sync pulse decoding : voting
+                uint8_t sync_pulse = (vive_sensors->sync_pulses[i] - 375) / 75;
+                axis += (sync_pulse & (1 << 0)) >> 0;
+                data += (sync_pulse & (1 << 1)) >> 1;
+                skip += (sync_pulse & (1 << 2)) >> 2;
+                nb_votes++;
+                
+                // get the timing
+                uint16_t timing = vive_sensors->timing[i];
+                
+                // get rid of invalid angle
+                if(timing>TIMING_angle_max_tick || timing<TIMING_angle_min_tick)
+                    continue;
+                
+                // convert timing to angles
+                vive_sensors_data->angles[i] = CY_M_PI*(((double) (timing)-TIMING_angle_center_tick)/(TIMING_cycle_max_tick*1.0));
+            }
+        } 
     }
     
     // sync pulse decoding : end of voting

@@ -72,6 +72,8 @@ int main(void) {
     /* VIVE sensors init : VIVE decoders and TS4231 init (It has to wait for light though).
     /!\ Because the tracker is waiting for light on every TS4231, the
     firmware can be stuck there */
+    
+    millis_timer_Start(); //for the timeout during init phase
     VIVE_sensors_init(vive_sensors);
     
     while(beacon_position_initialized == false) { // Wait until beacon position is initialized
