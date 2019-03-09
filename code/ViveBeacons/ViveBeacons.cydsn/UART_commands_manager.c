@@ -66,12 +66,10 @@ void UART_commands_manager_check_commands(UART_commands_manager *uart_commands_m
             char *command = strtok_r(uart_commands_manager->buffer, uart_commands_manager->delimiter, &(uart_commands_manager->last_token));
             
             if(command != NULL) {
-                bool matched = false;
                 
                 for(int i = 0; i < uart_commands_manager->command_count; i++) { // For each command in registered commands
                     if (strncmp(command, (uart_commands_manager->callbacks[i]).command, UART_COMMAND_MANAGER_MAX_COMMAND_LENGTH) == 0) {
                         (*((uart_commands_manager->callbacks[i]).callback_function))();
-                        matched = true;
                         break;
                     }
                 }

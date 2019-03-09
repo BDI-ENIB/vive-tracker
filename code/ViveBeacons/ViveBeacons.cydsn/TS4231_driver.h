@@ -24,7 +24,8 @@
 
 #define DEFAULT_CONFIGURATION_VALUE 0x392B
     
-#define TIMEOUT_LENGHT 1000
+#define MAX_COUNTER_VALUE 65535
+#define TIMEOUT_LENGTH 1000
 
 // Enums
 typedef enum State State;

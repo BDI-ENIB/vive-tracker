@@ -20,6 +20,7 @@
 #define K_AXIS 1
 
 #define SQRT_2 1.41421356237
+#define SQRT_3_2 0.8660254038 //sqrt(3)/2 for trigo
 
 // Sweeping axis
 #define HORIZONTAL_AXIS K_AXIS

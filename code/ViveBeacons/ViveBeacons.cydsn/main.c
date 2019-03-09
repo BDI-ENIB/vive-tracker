@@ -54,6 +54,7 @@ int main(void) {
         USB_commands_manager_init(usb_commands_manager);
         
         // USB register commands
+        
         USB_commands_manager_register_command(usb_commands_manager, "SBPOS", callback_set_beacon_position);
         USB_commands_manager_register_command(usb_commands_manager, "AYR", callback_are_you_ready);
         USB_commands_manager_register_command(usb_commands_manager, "GPOS", callback_send_position);
@@ -69,9 +70,7 @@ int main(void) {
         UART_commands_manager_register_command(uart_commands_manager, "GPOS", callback_send_position);
     }
     
-    /* VIVE sensors init : VIVE decoders and TS4231 init (It has to wait for light though).
-    /!\ Because the tracker is waiting for light on every TS4231, the
-    firmware can be stuck there */
+    /* VIVE sensors init : VIVE decoders and TS4231 init (It has to wait for light though).*/
     
     millis_timer_Start(); //for the timeout during init phase
     VIVE_sensors_init(vive_sensors);
@@ -164,6 +163,13 @@ void callback_are_you_ready() {
         
         ISDISCONNECTED(USB_UART_jumper) 
             UART_commands_manager_send_command(uart_commands_manager, "READY", "");
+    } 
+    else {
+        ISCONNECTED(USB_UART_jumper)
+            USB_commands_manager_send_command(usb_commands_manager, "NOT READY", "");
+        
+        ISDISCONNECTED(USB_UART_jumper) 
+            UART_commands_manager_send_command(uart_commands_manager, "NOT READY", "");
     }
 }
 
@@ -176,7 +182,7 @@ void callback_are_you_ready() {
 */
 
 void callback_send_position() {
-    bool is_valid = false;
+    bool is_valid = false; //TODO unprocessed ?
     char buffer[192];
     
     // Unpack the Position2D structure

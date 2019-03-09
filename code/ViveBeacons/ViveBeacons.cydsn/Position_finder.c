@@ -74,11 +74,13 @@ void Position_finder_init(Position_finder *position_finder, Position3D* beacon_p
     heading between those two points and the real one. Then perform a median
     filter to get rid of aberrant values.
         - Find the X,Y coordinates of the tracker. It takes every LEDs
-    positions, rotate backward by the heading value found before in order to
-    align relative tracker axis to the absolute table axis and substract with
-    tracker LEDs offsets to get a possible center value. Then, like before, a
-    median filter is performed.
-    ---------------------------------------------------------------------------
+    positions and get the average point, then it recalculates all positions relatives
+    to this point. For each LED that responded it calculate the static angle between
+    the center-to-average-point vector and the LED-to-average-point vector.
+    Using rotation matrix and static lenght of the vector it then calculate
+    the center-to-average-point vector, witch allow to get back the center coords.
+    A median filter is is perfomed to get rid of aberrant values.
+    ----------------------------------------------------------------------------
 */
 
 void Position_finder_find_position(Position_finder *position_finder, VIVE_sensors_data* vive_sensors_data) {
@@ -108,9 +110,9 @@ void Position_finder_find_position(Position_finder *position_finder, VIVE_sensor
     
     // If one of those structures pointers are NULL, that means that we have
     // not enough correct data to compute a position
-    if(position_finder->vive_sensors_data_h == NULL || position_finder->vive_sensors_data_v == NULL)
+    /*if(position_finder->vive_sensors_data_h == NULL || position_finder->vive_sensors_data_v == NULL)
         return;
-    
+    */
     // --- Process LED angles : compute the absolute LEDs coordinates with the angles (trigo power !) --- 
     for(int i = 0; i < 8; i++) {
         if(isnan(position_finder->vive_sensors_data_h->angles[i]) || isnan(position_finder->vive_sensors_data_v->angles[i]))
@@ -136,7 +138,8 @@ void Position_finder_find_position(Position_finder *position_finder, VIVE_sensor
             if(led_positions[i] == NULL || led_positions[j] == NULL) // If they responded
                 continue; // If not, continue to the next pair
             
-            if(isnan(led_positions[i]->x) || isnan(led_positions[i]->y) || isnan(led_positions[j]->x) || isnan(led_positions[j]->y)) // And if their coordinates are valid
+            // And if their coordinates are valid
+            if(isnan(led_positions[i]->x) || isnan(led_positions[i]->y) || isnan(led_positions[j]->x) || isnan(led_positions[j]->y)) 
                 continue; // If not, continue to the next pair
             
             // Compute a possible heading for each pair of LEDs : possible_heading = (applied_angle - theorical_angle)
@@ -169,51 +172,93 @@ void Position_finder_find_position(Position_finder *position_finder, VIVE_sensor
     } else // ... Worse case, nothing good
         position->a = NAN;
     
-    int nb_led_pos = 0;
-    
     // --- Compute X,Y position ---
-    for(int i = 0; i < 8; i+=2) { // For each LEDs
-        double heading = position_finder->current_position->a;
-        Position2D* current_led_position = led_positions[i];
-        
-        if(led_positions[i] == NULL) // If the LED position is valid
-            continue; // If not, continue to the next one
-        
-        // Rotate the x and y led coordinates by -heading rad, to align the
-        // tracker axis with the table axis
-        double x_rotated = cos(-heading)*current_led_position->x - sin(-heading)*current_led_position->y;
-        double y_rotated = sin(-heading)*current_led_position->x + cos(-heading)*current_led_position->y;
-        
-        nb_led_pos++;
-        
-        // Translate the LEDs coordinates by their offsets to find the possible tracker center coordinates.
-        // Then, add those coordinates to the x and y table coordinates
-        x_values = (double*) realloc(x_values, nb_led_pos*sizeof(double));
-        x_values[nb_led_pos-1] = x_rotated - position_finder->tracker_led_offset[i][X_AXIS];
-        
-        y_values = (double*) realloc(y_values, nb_led_pos*sizeof(double));
-        y_values[nb_led_pos-1] = y_rotated - position_finder->tracker_led_offset[i][Y_AXIS];
+    
+    //set-up : changing calculs origin, making list of working leds, working on offsets
+    double medium_x = 0;
+    double medium_y = 0;
+    int nb_leds = 0;
+    int valid_leds[8] = {0};
+    for(int i = 0; i < 8; i++) { // For each LEDs
+        if(isnan(led_positions[i]->x) || isnan(led_positions[i]->y)){ continue; } //if the led is valid
+        medium_x += led_positions[i]->x;
+        medium_y += led_positions[i]->y;
+        valid_leds[i] = 1; //remember for later
+        nb_leds++;
     }
     
-    if(nb_led_pos > 1) { // If more than 1 pair of LEDs responded, then do a MEDIAN FILTER
-        // -- Median filter --
-        qsort(x_values, nb_led_pos, sizeof(double), Position_finder_compare);
-        qsort(y_values, nb_led_pos, sizeof(double), Position_finder_compare);
-        
-        if((nb_led_pos % 2) == 0) { // If length of x_values and y_values is even, compute the average between the 2 values in the center
-            position->x = (x_values[(int) floor(nb_led_pos/2.0)] + x_values[(int) ceil(nb_led_pos/2.0)]) / 2;
-            position->y = (y_values[(int) floor(nb_led_pos/2.0)] + y_values[(int) ceil(nb_led_pos/2.0)]) / 2;
-        } else {  // Otherwise, take the center value
-            position->x = x_values[nb_led_pos/2];
-            position->y = x_values[nb_led_pos/2];
+    medium_x /= nb_leds; //medium point
+    medium_y /= nb_leds;
+    
+    for(int i = 0; i < 8; i++) {
+        if (valid_leds[i]) { //if the leds are valid
+            led_positions[i]->x -= medium_x;    //recenter them around the medium point
+            led_positions[i]->y -= medium_y;
         }
-    } else if(nb_led_pos == 1) { // If only 1 LED responded, then we can only trust it
-        position->x = x_values[0];
-        position->y = y_values[0];
-    } else { // ... Worse case, nothing good
-        position->x = NAN;
-        position->y = NAN;
     }
+    
+    double cst_medium_x = 0;
+    double cst_medium_y = 0;
+    for(int i = 0; i <8; i++) {
+        if (valid_leds[i]) { //if the leds are valid
+            cst_medium_x = position_finder->tracker_led_offset[i][X_AXIS];
+            cst_medium_y = position_finder->tracker_led_offset[i][Y_AXIS];
+        }
+    }
+    
+    cst_medium_x /= nb_leds;  //medium point in offset coords
+    cst_medium_y /= nb_leds;
+    
+    const double medium_module = sqrt(cst_medium_x*cst_medium_x + cst_medium_y*cst_medium_y); 
+    
+    //allocation of the table to recieve results, note that nno reallocation is necessary here because we already now how much leds there is
+    x_values = (double*) malloc(nb_leds*sizeof(double));
+    
+    //calcul part
+    for (int i =0; i< 8; i++) {
+        if (valid_leds[i]) {
+            //TODO: setup circular coords for offset leds positions
+            
+            //setup calculs
+            const double point_module = sqrt(position_finder->tracker_led_offset[i][X_AXIS]*position_finder->tracker_led_offset[i][X_AXIS]
+                                             +position_finder->tracker_led_offset[i][Y_AXIS]*position_finder->tracker_led_offset[i][Y_AXIS]);
+            const double offset_factor = medium_module/point_module;
+            
+            const double point_angle = atan2(position_finder->tracker_led_offset[i][Y_AXIS],position_finder->tracker_led_offset[i][X_AXIS]);
+            const double medium_point_angle = CY_M_PI - point_angle;
+            
+            const double cos_medium_point_angle = cos(medium_point_angle);
+            const double sin_medium_point_angle = sin(medium_point_angle);
+            
+            //final calcul: this is where the magic appends
+            const double center_point_x = medium_x + cos_medium_point_angle * led_positions[i]->x + sin_medium_point_angle * led_positions[i]->y; 
+            const double center_point_y = medium_x - sin_medium_point_angle * led_positions[i]->x - cos_medium_point_angle * led_positions[i]->y;
+            
+            //saving the results
+            x_values[i] = center_point_x;
+            y_values[i] = center_point_y;
+        }
+    }    
+        
+    if(nb_leds > 1) { // If more than 1 LED responded, then do a MEDIAN FILTER
+        // -- Median filter --
+        qsort(x_values, nb_leds, sizeof(double), Position_finder_compare); // sort
+        qsort(y_values, nb_leds, sizeof(double), Position_finder_compare);
+            
+        if((nb_leds % 2) == 0) { // If length of heading_values is even, compute the average between the 2 values in the center
+            position->x = (x_values[(int) floor(nb_leds/2.0)] + heading_values[(int) ceil(nb_leds/2.0)]) / 2;
+            position->y = (y_values[(int) floor(nb_leds/2.0)] + heading_values[(int) ceil(nb_leds/2.0)]) / 2;
+        } else { // Otherwise, take the center value
+            position->x = x_values[nb_leds/2];
+            position->y = y_values[nb_leds/2];
+        }
+    } else if(nb_pair == 1) { // If only 1 pair of LEDs responded, then we can only trust it
+            position->x = x_values[0];
+            position->y = y_values[0];
+        } else { // ... Worse case, nothing good
+            position->x = NAN;
+            position->y = NAN;
+        }
     
     // --- Free dynamic allocated temporary data ---
     for(int i = 0; i < 8; i++) {
@@ -252,7 +297,7 @@ double Position_finder_normalize_angle(double angle) {
     ---------------------------------------------------------------------------
 */
 
-static int Position_finder_compare(void const *a, void const *b)
+int Position_finder_compare(void const *a, void const *b)
 {
     int ret = 0;
     double const *pa = a;

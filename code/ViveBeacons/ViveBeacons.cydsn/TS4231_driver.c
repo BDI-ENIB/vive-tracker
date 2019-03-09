@@ -187,16 +187,18 @@ void TS4231_driver_delete(TS4231_driver* ts4231_driver) {
 */
 
 bool TS4231_driver_wait_for_light(TS4231_driver* ts4231_driver) {
-    millis_timer_Init(); //resetting the timer
+    timer_control_Write(1); //reset the millis_timer
+    //timer_control_Write(0);
+    
     uint16_t time0 = millis_timer_ReadCounter();
     
     if (TS4231_driver_check_bus(ts4231_driver) == S0) {
         while (true) {
             time0 = millis_timer_ReadCounter();
-            if (time0 == TIMEOUT_LENGHT) { return false; } //waited for too long
+            if (time0 <= MAX_COUNTER_VALUE-TIMEOUT_LENGTH) { return false; } //waited for too long, counter does only count down
             if (CyPins_ReadPin(ts4231_driver->data_pin) != 0) { //light detected
                 while (true) {
-                    if (time0 == TIMEOUT_LENGHT) { return false; } //waited for too long
+                    if (time0 <= MAX_COUNTER_VALUE-2*TIMEOUT_LENGTH) { return false; } //waited for too long
                     if (CyPins_ReadPin(ts4231_driver->data_pin) == 0) {
                        return true;
                     }
