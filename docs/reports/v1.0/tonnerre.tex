@@ -18,37 +18,37 @@ Sa transmission se fait en sans-fil, via les xBee présents sur les balises.
 \hline
 N° & Type  & Description du type & Longueur d'argument & ACK requis & Section \\
 \hline
-0  & ACK   & Acknowledgement     &          & No & \ref{subsec:ACK} \\
+0  & ACK   & Acknowledgement     &          & No & \ref{subsec:t:ACK} \\
 \hline
-1  & POS   & Position            & 4 bytes  & No & \ref{subsec:POS} \\
-2  & SBPOS & Set Balise Position & 24 bytes & Yes & \ref{subsec:SBPOS} \\
+1  & POS   & Position            & 4 bytes  & No & \ref{subsec:t:POS} \\
+2  & SBPOS & Set Balise Position & 24 bytes & Yes & \ref{subsec:t:SBPOS} \\
 \hline
-3  & PING  & Ping                & 1 byte   & No & \ref{subsec:PING-PONG} \\
-4  & PONG  & Ping answer         & 1 byte   & No & \ref{subsec:PING-PONG} \\
+3  & PING  & Ping                & 1 byte   & No & \ref{subsec:t:PING-PONG} \\
+4  & PONG  & Ping answer         & 1 byte   & No & \ref{subsec:t:PING-PONG} \\
 \hline
-5  & SBBOX & Set Bounding Box    & 2 bytes  & Yes & \ref{subsec:SBBOX} \\
+5  & SBBOX & Set Bounding Box    & 2 bytes  & Yes & \ref{subsec:t:SBBOX} \\
 \hline
-10 & SP    & Start Protocol      & 4 bytes  & Yes & \ref{subsec:SP-EP} \\
-11 & EP    & End Protocol        & 4 bytes  & Yes & \ref{subsec:SP-EP} \\
+10 & SP    & Start Protocol      & 4 bytes  & Yes & \ref{subsec:t:SP-EP} \\
+11 & EP    & End Protocol        & 4 bytes  & Yes & \ref{subsec:t:SP-EP} \\
 \hline
-20 & SM    & Start Match         &          & Yes & \ref{subsec:SM-EM} \\
-21 & EM    & End Match           &          & Yes & \ref{subsec:SM-EM} \\
+20 & SM    & Start Match         &          & Yes & \ref{subsec:t:SM-EM} \\
+21 & EM    & End Match           &          & Yes & \ref{subsec:t:SM-EM} \\
 \hline
-30 & MSG   & Message             & 8 bytes  & Yes & \ref{subsec:MSG} \\
+30 & MSG   & Message             & 8 bytes  & Yes & \ref{subsec:t:MSG} \\
 \hline
-69 & QT    & Qute                & 4 bytes  & No & \ref{subsec:QT} \\
+69 & QT    & Qute                & 4 bytes  & No & \ref{subsec:t:QT} \\
 \hline
 
 \end{tabular}
 
 \subsection{ACK}
-	\label{subsec:ACK}
+	\label{subsec:t:ACK}
 
 	Accusé de réception envoyé par une balise lorsqu'elle reçoit un quelconque message qui requiert un ACK.
 	L'ID de message de l'accusé de réception est le même que celui du message reçu.
 
 \subsection{POS}
-	\label{subsec:POS}
+	\label{subsec:t:POS}
 
 	Information de position de la balise.
 
@@ -61,7 +61,7 @@ N° & Type  & Description du type & Longueur d'argument & ACK requis & Section \
 	\end{description}
 
 \subsection{SBPOS}
-	\label{subsec:SBPOS}
+	\label{subsec:t:SBPOS}
 
 	Information de position du phare.
 
@@ -72,7 +72,7 @@ N° & Type  & Description du type & Longueur d'argument & ACK requis & Section \
 	\emph{Si les informations envoyées par cette commande ne sont pas correctement reçues, la position renvoyée par la balise sera erronée.}
 
 \subsection{PING--PONG}
-	\label{subsec:PING-PONG}
+	\label{subsec:t:PING-PONG}
 
 	Les commandes PING et PONG sont liées, PONG est l'accusé de réception de PING.
 
@@ -83,31 +83,31 @@ N° & Type  & Description du type & Longueur d'argument & ACK requis & Section \
 	L'ID de message du PONG est celui du PING correspondant.
 
 \subsection{SBBOX}
-	\label{subsec:SBBOX}
+	\label{subsec:t:SBBOX}
 
 	Définit le diamètre du robot cible.
 
 	Son argument est un \verb|float|, le diamètre en question.
 
 \subsection{SP--EP}
-	\label{subsec:SP-EP}
+	\label{subsec:t:SP-EP}
 
 	Commandes informant les autres robots du début (de la fin) d'un protocole.
 
 	L'argument est l' n° de protocole sous la forme d'un entier signé 32 bits.
 
 \subsection{SM--EM}
-	\label{subsec:SM-EM}
+	\label{subsec:t:SM-EM}
 
 	Commandes informant les autres robots du début (de la fin) du match.
 
 \subsection{MSG}
-	\label{subsec:MSG}
+	\label{subsec:t:MSG}
 
 	Commande de message générique de longueur 8 octets.
 
 \subsection{QT}
-	\label{subsec:QT}
+	\label{subsec:t:QT}
 
 	Commande de contrôle de l'affichage LED WS2812 de la couronne.
 
