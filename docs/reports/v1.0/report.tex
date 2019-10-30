@@ -1,4 +1,6 @@
-﻿\documentclass[10pt,a4paper,french]{report}
+﻿\documentclass[10pt,a4paper,french,draft]{report}
+
+\includeonly{protocoles/protocoles}
 
 \usepackage{fontspec}
 \usepackage{xunicode}
@@ -16,6 +18,7 @@
 \usepackage{hyperref}
 
 \usepackage{float}
+\usepackage{diagbox}
 
 \title{Système de positionnement d'un robot mobile basé sur le HTC Vive (technologie Lighthouse)}
 \author{Evan \bsc{Roué}}
@@ -37,11 +40,11 @@
 
 \include{design}
 
-\include{protocoles}
+\include{protocoles/protocoles}
 
 \include{tests}
 
-\include{historique}
+\include{historique/historique}
 
 \include{conclusion}
 

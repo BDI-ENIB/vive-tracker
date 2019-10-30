@@ -1,0 +1,46 @@
+\section{Qute}
+\label{sec:Qute}
+
+Protocole de gestion des LEDs WS2812 (Neopixels) présentes sur les balises.
+
+Utilisé par les commandes QT des protocoles Arsenal et Tonnerre.
+
+Les commandes sont de la forme :
+
+\begin{description}
+	\item[R] 1 octet, intensité de rouge
+	\item[G] 1 octet, intensité de vert
+	\item[B] 1 octet, intensité de bleu
+	\item[A] 1 octet, id d'animation décrits dans le tableau \ref{fig:codes-animation-QT}
+\end{description}
+
+\begin{table}[htb]
+	\centering
+	\begin{tabular}{|cl|} \hline
+		ID   & Description \\ \hline
+		0x00 & Éteint \\
+		0x01 & Fixe \\
+		0x02 & Affichage debug des capteurs IRInterface \\
+		0x03 & Rotatif horaire \\
+		0x04 & Rotatif trigonométrique \\
+		0x10 & LED 0 seulement \\
+		0x11 & LED 1 seulement \\
+		0x12 & LED 2 seulement \\
+		0x13 & LED 3 seulement \\
+		0x14 & LED 4 seulement \\
+		0x15 & LED 5 seulement \\
+		0x16 & LED 6 seulement \\
+		0x17 & LED 7 seulement \\
+		0x20 & LED 0 éteinte, les autres allumées \\
+		0x21 & LED 1 éteinte, les autres allumées \\
+		0x22 & LED 2 éteinte, les autres allumées \\
+		0x23 & LED 3 éteinte, les autres allumées \\
+		0x24 & LED 4 éteinte, les autres allumées \\
+		0x25 & LED 5 éteinte, les autres allumées \\
+		0x26 & LED 6 éteinte, les autres allumées \\
+		0x27 & LED 7 éteinte, les autres allumées \\
+		\hline
+	\end{tabular}
+	\caption{Codes d'animation Qute}
+	\label{fig:codes-animation-QT}
+\end{table}

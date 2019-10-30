@@ -1,0 +1,126 @@
+﻿\section{Arsenal}
+
+Arsenal est le protocole de communication entre une balise et le microcontrôleur
+du robot portant cette balise.
+
+Le transport se fait par liaison série UART ou USB. C'est un protocole texte, lisible par un humain.
+
+Les commandes sont composées de plusieurs parties, séparées par une espace standard (\verb|U+0020|).
+Les commandes sont séparées entre elles par un point-virgule (\verb|;|).
+
+Une commande est composée des partie suivantes:
+
+\begin{description}
+	\item[Type] Type de commande
+	\item[ID VIVE] Identifiant VIVE
+	\item[Arguments] Données utiles du message
+\end{description}
+
+Les commandes sont décrites dans le tableau \ref{fig:commandes-arsenal} et les sous-sections qui suivent.
+
+L'ID VIVE est un identifiant assigné à chaque balise avant les matchs. Il est défini dans les messages comme décrit dans le tableau \ref{fig:a:sens-id-vive}.
+
+\begin{table}[htb]
+	\centering
+	\begin{tabular}{|r|c|c|} \hline
+		\diagbox{Présence d'ID}{Provenance} & Microcontrôleur & Balise        \\ \hline
+		Oui                                 & Balise cible    & Balise source \\ \hline
+		Non                                 & Broadcast       & X             \\ \hline
+	\end{tabular}
+	\caption{Sens de l'ID VIVE}
+	\label{fig:a:sens-id-vive}
+\end{table}
+
+
+\begin{table}[htb]
+	\centering
+	\begin{tabular}{|c|l|l|c|l|}
+		\hline
+		Type        & Description du type & Longueur d'argument & ID requis & Section            \\
+		\hline
+		POS         & Position            & 4 bytes             & No        & \ref{subsec:a:POS}   \\
+		\hline
+		SBPOS       & Set Balise Position & 24 bytes            & Yes       & \ref{subsec:a:SBPOS} \\
+		SBBOX       & Set Bounding Box    & 2 bytes             & Yes       & \ref{subsec:a:SBBOX} \\
+		SETID       & Set VIVE ID         &                     &           & \ref{subsec:a:SBBOX} \\
+		\hline
+		STPROTOCOL  & Start Protocol      & 4 bytes             & Yes       & \ref{subsec:a:SP-EP} \\
+		ENDPROTOCOL & End Protocol        & 4 bytes             & Yes       & \ref{subsec:a:SP-EP} \\
+		\hline
+		STMATCH     & Start Match         &                     & Yes       & \ref{subsec:a:SM-EM} \\
+		ENDMATCH    & End Match           &                     & Yes       & \ref{subsec:a:SM-EM} \\
+		\hline
+		MSG         & Message             & 8 bytes             & Yes       & \ref{subsec:a:MSG}   \\
+		\hline
+		QT          & Qute                & 4 bytes             & No        & \ref{subsec:a:QT}    \\
+		\hline
+	\end{tabular}
+	\caption{Commandes Arsenal}
+	\label{fig:commandes-arsenal}
+\end{table}
+
+
+\subsection{POS}
+	\label{subsec:a:POS}
+
+	Information de position de la balise, envoyé par la balise au microcontrôleur uniquement.
+
+	Composé des coordonnées $x$, $y$, $\theta$ de la balise ID VIVE, réparties comme suit:
+
+	\begin{description}
+		\item[$x$] 11 bits
+		\item[$y$] 12 bits
+		\item[$\theta$] 9 bits
+	\end{description}
+
+\subsection{SBPOS}
+	\label{subsec:a:SBPOS}
+
+	Information de position du phare.
+
+	Composé des coordonnées $x$, $y$, $z$, $\alpha$, $\beta$, $\gamma$ du phare, au format \verb|float|.
+
+	Cette commande est utilisée au début du match pour informer les balises de la position exacte du phare par rapport au $0$ de la table. Le robot principal utilise cette commande qui déclenche ensuite un broadcast de la commande Tonnerre correspondante, cf section \ref{subsec:t:SBPOS}.
+
+	\emph{Si les informations envoyées par cette commande ne sont pas correctement reçues, la position renvoyée par la balise sera erronée.}
+
+\subsection{SBBOX}
+	\label{subsec:a:SBBOX}
+
+	Définit le diamètre du robot cible.
+
+	Son argument est un \verb|float|, le diamètre en question.
+
+	Envoyé par le robot principal aux balises placées sur les robots adverses pour leur permettre de signaler une collision imminente.
+
+\subsection{STPROTOCOL--ENDPROTOCOL}
+	\label{subsec:a:SP-EP}
+
+	Commandes informant les autres robots du début (de la fin) d'un protocole.
+
+	L'argument est l' n° de protocole sous la forme d'un entier signé 32 bits.
+
+	Lors de leur émission, l'ID VIVE n'est pas requis, il sera défini par le VIVE récepteur en fonction de la provenance.
+
+\subsection{STMATCH--ENDMATCH}
+	\label{subsec:a:SM-EM}
+
+	Commandes informant les autres robots du début (de la fin) du match.
+
+	Lors de leur émission, l'ID VIVE n'est pas requis, il sera défini par le VIVE récepteur en fonction de la provenance.
+
+\subsection{MSG}
+	\label{subsec:a:MSG}
+
+	Commande de message générique de longueur 8 octets.
+
+	Si un ID VIVE est défini lors de l'envoi, c'est uniquement le robot correspondant qui recevra le message. Sinon, c'est un broadcast.
+
+\subsection{QT}
+	\label{subsec:a:QT}
+
+	Commande de contrôle de l'affichage LED WS2812 de la couronne.
+
+	Utilise le protocole Qute décrit en section \ref{sec:Qute}.
+
+	Si un ID VIVE est défini lors de l'envoi, c'est uniquement le robot correspondant qui recevra le message. Sinon, c'est un broadcast.

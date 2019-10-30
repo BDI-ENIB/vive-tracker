@@ -3,43 +3,44 @@
 Tonnerre est le protocole de communication entre balises VIVE.
 Sa transmission se fait en sans-fil, via les xBee présents sur les balises.
 
-\subsection{Forme générale}
-
 \begin{description}
 	\item[1 byte] N° de commande
 	\item[1 byte] ID de message, incrémenté à chaque envoi de message. Boucle en cas d'overflow.
 	\item[24 bytes] Argument de la commande
 \end{description}
 
-\subsection{Tableau des commandes}
+Les commandes sont décrites dans le tableau \ref{fig:commandes-tonnerre} et les sous-sections qui suivent.
 
-\begin{tabular}{|c|c|l|l|c|l|}
-
-\hline
-N° & Type  & Description du type & Longueur d'argument & ACK requis & Section \\
-\hline
-0  & ACK   & Acknowledgement     &          & No & \ref{subsec:t:ACK} \\
-\hline
-1  & POS   & Position            & 4 bytes  & No & \ref{subsec:t:POS} \\
-2  & SBPOS & Set Balise Position & 24 bytes & Yes & \ref{subsec:t:SBPOS} \\
-\hline
-3  & PING  & Ping                & 1 byte   & No & \ref{subsec:t:PING-PONG} \\
-4  & PONG  & Ping answer         & 1 byte   & No & \ref{subsec:t:PING-PONG} \\
-\hline
-5  & SBBOX & Set Bounding Box    & 2 bytes  & Yes & \ref{subsec:t:SBBOX} \\
-\hline
-10 & SP    & Start Protocol      & 4 bytes  & Yes & \ref{subsec:t:SP-EP} \\
-11 & EP    & End Protocol        & 4 bytes  & Yes & \ref{subsec:t:SP-EP} \\
-\hline
-20 & SM    & Start Match         &          & Yes & \ref{subsec:t:SM-EM} \\
-21 & EM    & End Match           &          & Yes & \ref{subsec:t:SM-EM} \\
-\hline
-30 & MSG   & Message             & 8 bytes  & Yes & \ref{subsec:t:MSG} \\
-\hline
-69 & QT    & Qute                & 4 bytes  & No & \ref{subsec:t:QT} \\
-\hline
-
-\end{tabular}
+\begin{table}[htb]
+	\centering
+	\begin{tabular}{|c|c|l|l|c|l|}
+		\hline
+		N° & Type  & Description du type & Longueur d'argument & ACK requis & Section \\
+		\hline
+		0  & ACK   & Acknowledgement     &          & No & \ref{subsec:t:ACK} \\
+		\hline
+		1  & POS   & Position            & 4 bytes  & No & \ref{subsec:t:POS} \\
+		2  & SBPOS & Set Balise Position & 24 bytes & Yes & \ref{subsec:t:SBPOS} \\
+		\hline
+		3  & PING  & Ping                & 1 byte   & No & \ref{subsec:t:PING-PONG} \\
+		4  & PONG  & Ping answer         & 1 byte   & No & \ref{subsec:t:PING-PONG} \\
+		\hline
+		5  & SBBOX & Set Bounding Box    & 2 bytes  & Yes & \ref{subsec:t:SBBOX} \\
+		\hline
+		10 & SP    & Start Protocol      & 4 bytes  & Yes & \ref{subsec:t:SP-EP} \\
+		11 & EP    & End Protocol        & 4 bytes  & Yes & \ref{subsec:t:SP-EP} \\
+		\hline
+		20 & SM    & Start Match         &          & Yes & \ref{subsec:t:SM-EM} \\
+		21 & EM    & End Match           &          & Yes & \ref{subsec:t:SM-EM} \\
+		\hline
+		30 & MSG   & Message             & 8 bytes  & Yes & \ref{subsec:t:MSG} \\
+		\hline
+		69 & QT    & Qute                & 4 bytes  & No & \ref{subsec:t:QT} \\
+		\hline
+	\end{tabular}
+	\caption{Commandes Tonnerre}
+	\label{fig:commandes-tonnerre}
+\end{table}
 
 \subsection{ACK}
 	\label{subsec:t:ACK}
@@ -111,39 +112,4 @@ N° & Type  & Description du type & Longueur d'argument & ACK requis & Section \
 
 	Commande de contrôle de l'affichage LED WS2812 de la couronne.
 
-	Les arguments sont:
-
-	\begin{description}
-		\item[R] 1 octet, intensité de rouge
-		\item[G] 1 octet, intensité de vert
-		\item[B] 1 octet, intensité de bleu
-		\item[A] 1 octet, id d'animation
-	\end{description}
-
-	Les animations disponibles sont:
-
-	\begin{tabular}{|cl|} \hline
-		ID & Description \\ \hline
-		0  & Éteint \\
-		1  & Fixe \\
-		2  & Affichage debug des capteurs IRInterface \\
-		3  & Rotatif horaire \\
-		4  & Rotatif trigonométrique \\
-		10 & LED 0 seulement \\
-		11 & LED 1 seulement \\
-		12 & LED 2 seulement \\
-		13 & LED 3 seulement \\
-		14 & LED 4 seulement \\
-		15 & LED 5 seulement \\
-		16 & LED 6 seulement \\
-		17 & LED 7 seulement \\
-		20 & LED 0 éteinte, les autres allumées \\
-		21 & LED 1 éteinte, les autres allumées \\
-		22 & LED 2 éteinte, les autres allumées \\
-		23 & LED 3 éteinte, les autres allumées \\
-		24 & LED 4 éteinte, les autres allumées \\
-		25 & LED 5 éteinte, les autres allumées \\
-		26 & LED 6 éteinte, les autres allumées \\
-		27 & LED 7 éteinte, les autres allumées \\
-		\hline
-	\end{tabular}
+	Utilise le protocole Qute décrit en section \ref{sec:Qute}.
