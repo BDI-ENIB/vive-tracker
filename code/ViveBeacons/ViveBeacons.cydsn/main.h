@@ -20,6 +20,7 @@
 #include "configuration.h"
 #include "UART_commands_manager.h"
 #include "USB_commands_manager.h"
+#include "XBee_driver.h"
 
 /*
 Position of LEDs in tracker's coordinates (aka relative to its center).

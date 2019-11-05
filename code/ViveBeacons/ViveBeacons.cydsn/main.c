@@ -36,6 +36,7 @@ USB_commands_manager* usb_commands_manager = NULL;
 VIVE_sensors_data* vive_sensors_data = NULL;
 VIVE_sensors* vive_sensors = NULL;
 Position_finder* position_finder = NULL;
+XBee_driver* xBee_driver = NULL;
 
 int main(void) {    
     // Creating handler objects
@@ -45,6 +46,7 @@ int main(void) {
         usb_commands_manager = USB_commands_manager_create();
     ISDISCONNECTED(USB_UART_jumper)
         uart_commands_manager = UART_commands_manager_create();
+    xBee_driver = XBee_driver_create();
     
     CyGlobalIntEnable;
     
