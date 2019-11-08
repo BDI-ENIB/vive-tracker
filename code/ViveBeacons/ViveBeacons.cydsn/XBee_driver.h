@@ -106,6 +106,10 @@ void XBee_driver_send(XBee_driver *xBee_driver, const void *xBee_frame, const ui
 void XBee_driver_check_commands(XBee_driver *xBee_driver);
 uint8_t XBee_driver_compute_checksum(const uint8_t *frame, const uint16_t frame_length);
 
+// Private methods
+uint8_t XBee_driver_get_byte(XBee_driver *xBee_driver);
+void XBee_driver_send_byte(XBee_driver *xBee_driver, uint8_t byte);
+
 #endif
 
 /* [] END OF FILE */
