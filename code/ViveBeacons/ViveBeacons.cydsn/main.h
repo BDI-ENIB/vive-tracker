@@ -21,7 +21,8 @@
 #include "UART_commands_manager.h"
 #include "USB_commands_manager.h"
 #include "XBee_driver.h"
-
+#include "XBee_driver_unit_tests.h"
+    
 /*
 Position of LEDs in tracker's coordinates (aka relative to its center).
 This is a list of couples of coordinates {(X0,Y0), (X1,Y1), ..., (X7,Y7)}

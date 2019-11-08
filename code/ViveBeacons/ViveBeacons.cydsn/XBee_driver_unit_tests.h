@@ -21,7 +21,7 @@
 extern XBee_driver* xBee_driver;
 
 // TX unit test
-
+void xBee_driver_unit_test_TX();
 
 // RX unit test
 void xBee_driver_unit_test_RX_callback(uint8_t *frame_buffer);
