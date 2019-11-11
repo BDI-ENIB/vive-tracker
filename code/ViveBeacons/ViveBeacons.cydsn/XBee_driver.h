@@ -91,7 +91,7 @@ struct XBee_TX_frame {
 typedef struct XBee_RX_frame XBee_RX_frame;
 struct XBee_RX_frame {
     uint8_t type;
-    uint16_t dest_addr;
+    uint16_t src_addr;
     uint8_t RSSI;
     uint8_t options;
     uint8_t data[100];
