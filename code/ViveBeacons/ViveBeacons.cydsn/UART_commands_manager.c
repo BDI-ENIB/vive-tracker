@@ -22,6 +22,7 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "project.h"
 #include "UART_commands_manager.h"
 
@@ -50,7 +51,7 @@ UART_commands_manager* UART_commands_manager_create() {
     // Clear buffer
     uart_commands_manager->buffer[0] = '\0';
     uart_commands_manager->buffer_pos = 0;
-            
+    
     return uart_commands_manager;
 }
 
@@ -70,8 +71,10 @@ void UART_commands_manager_check_commands(UART_commands_manager *uart_commands_m
         if(character == 0)
             break;
         
-        if(character == '\n') {
-            char *command = strtok_r(uart_commands_manager->buffer, uart_commands_manager->delimiter, &(uart_commands_manager->last_token));
+        if(character == ';') {
+            char temp[10]; // The end character is also a delimiter FOR strtok_r function. 
+            sprintf(temp, "%s%s", uart_commands_manager->delimiter, ";");
+            char *command = strtok_r(uart_commands_manager->buffer, temp, &(uart_commands_manager->last_token));
             
             if(command != NULL) {
                 
@@ -97,12 +100,14 @@ void UART_commands_manager_check_commands(UART_commands_manager *uart_commands_m
 }
 
 char* UART_commands_manager_get_next_token(UART_commands_manager *uart_commands_manager) {
-    return strtok_r(NULL, uart_commands_manager->delimiter, &(uart_commands_manager->last_token));
+    char temp[10]; // The end character is also a delimiter FOR strtok_r function. 
+    sprintf(temp, "%s%s", uart_commands_manager->delimiter, ";");
+    return strtok_r(NULL, temp, &(uart_commands_manager->last_token));
 }
 
 void UART_commands_manager_send_command(UART_commands_manager *uart_commands_manager, char command[UART_COMMAND_MANAGER_MAX_COMMAND_LENGTH + 1], char args[UART_COMMAND_MANAGER_MAX_BUFFER_SIZE - (UART_COMMAND_MANAGER_MAX_COMMAND_LENGTH + 1) + 1]) {
     UART_TEENSY_PutString(command);
     UART_TEENSY_PutString(uart_commands_manager->delimiter);
     UART_TEENSY_PutString(args);
-    UART_TEENSY_PutString("\n");
+    UART_TEENSY_PutString(";");
 }

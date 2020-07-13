@@ -18,38 +18,29 @@
  * ============================================================================
 */
 
-#if !defined(CONFIGURATION_H)
-#define CONFIGURATION_H
+#if !defined(ARSENAL_COMMANDS_H)
+#define ARSENAL_COMMANDS_H
 
 #include <cytypes.h>
+#include "project.h"
+#include "Arsenal.h"
+#include "Tonnerre.h"
+#include "position.h"
 
-// Lighthouse beacon axis names
-#define J_AXIS 0
-#define K_AXIS 1
+// RX commands
+void Arsenal_commands_set_beacon_position_callback();
+void Arsenal_commands_start_protocol_callback();
+void Arsenal_commands_end_protocol_callback();
+void Arsenal_commands_start_match_callback();
+void Arsenal_commands_end_match_callback();
 
-#define SQRT_2 1.41421356237
-#define SQRT_3_2 0.8660254038 //sqrt(3)/2 for trigo
+// TX commands
+void Arsenal_commands_send_pos(uint16_t ID, Position2D *pos);
+void Arsenal_commands_send_start_protocol(uint16_t ID, uint32_t protocol_ID);
+void Arsenal_commands_send_end_protocol(uint16_t ID, uint32_t protocol_ID);
+void Arsenal_commands_send_start_match(uint16_t ID);
+void Arsenal_commands_send_end_match(uint16_t ID);
 
-// Sweeping axis
-#define HORIZONTAL_AXIS K_AXIS
-#define VERTICAL_AXIS J_AXIS
-
-// LEDs height
-#define LED_COORD_HEIGHT 0
-
-// Helps for tracker offsets table
-#define X_AXIS 0
-#define Y_AXIS 1
-#define Z_AXIS 2
-
-// -- Jumper configuration --
-#define USB_UART_jumper jumper_pins_7
-#define ID_1 jumper_pins_6
-#define ID_0 jumper_pins_5
-
-#define ISCONNECTED(pin) if(CyPins_ReadPin(pin) == 0)
-#define ISDISCONNECTED(pin) if(CyPins_ReadPin(pin))
-
-#endif 
+#endif
 
 /* [] END OF FILE */

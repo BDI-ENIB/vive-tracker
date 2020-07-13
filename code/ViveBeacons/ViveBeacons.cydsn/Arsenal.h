@@ -18,38 +18,33 @@
  * ============================================================================
 */
 
-#if !defined(CONFIGURATION_H)
-#define CONFIGURATION_H
+#if !defined(ARSENAL_H)
+#define ARSENAL_H
 
 #include <cytypes.h>
+#include "project.h"
+#include "USB_commands_manager.h"
+#include "UART_commands_manager.h"
 
-// Lighthouse beacon axis names
-#define J_AXIS 0
-#define K_AXIS 1
+#define ARSENAL_MAX_BUFFER_SIZE 256
+#define ARSENAL_MAX_COMMAND_LENGTH 32 // Max argument size for Arsenal messages
 
-#define SQRT_2 1.41421356237
-#define SQRT_3_2 0.8660254038 //sqrt(3)/2 for trigo
+// Data structure
+typedef struct Arsenal Arsenal;
+struct Arsenal
+{
+    UART_commands_manager* uart_commands_manager;
+    USB_commands_manager* usb_commands_manager;
+};
 
-// Sweeping axis
-#define HORIZONTAL_AXIS K_AXIS
-#define VERTICAL_AXIS J_AXIS
+// Public methods
+Arsenal* Arsenal_create();
+void Arsenal_init(Arsenal *Arsenal);
+void Arsenal_register_command(Arsenal* arsenal, const char *command, void (*callback_function)());
+void Arsenal_check_commands(Arsenal* arsenal);
+char* Arsenal_get_next_token(Arsenal* arsenal);
+void Arsenal_send_command(Arsenal* arsenal, char command[ARSENAL_MAX_COMMAND_LENGTH + 1], uint16_t ID, char args[ARSENAL_MAX_BUFFER_SIZE - (ARSENAL_MAX_COMMAND_LENGTH + 1) + 1]);
 
-// LEDs height
-#define LED_COORD_HEIGHT 0
-
-// Helps for tracker offsets table
-#define X_AXIS 0
-#define Y_AXIS 1
-#define Z_AXIS 2
-
-// -- Jumper configuration --
-#define USB_UART_jumper jumper_pins_7
-#define ID_1 jumper_pins_6
-#define ID_0 jumper_pins_5
-
-#define ISCONNECTED(pin) if(CyPins_ReadPin(pin) == 0)
-#define ISDISCONNECTED(pin) if(CyPins_ReadPin(pin))
-
-#endif 
+#endif
 
 /* [] END OF FILE */

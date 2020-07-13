@@ -79,7 +79,9 @@ void XBee_driver_create_TX_request(XBee_driver *xBee_driver, XBee_TX_frame *xBee
     xBee_TX_frame->id = frame_id;
     xBee_TX_frame->dest_addr = SWAP_ENDIAN_16(dest_address);
     xBee_TX_frame->options = frame_options;
-    memcpy(xBee_TX_frame->data, payload, payload_length);
+    
+    if(payload_length != 0)
+        memcpy(xBee_TX_frame->data, payload, payload_length);
 }
 
 /*
@@ -104,7 +106,8 @@ void XBee_driver_send(XBee_driver *xBee_driver, const void *xBee_frame, const ui
     buffer[0] = (frame_length >> 8);
     buffer[1] = (frame_length & 0xFF);
     
-    memcpy(buffer + 2, frame, frame_length);
+    if(frame_length != 0)
+        memcpy(buffer + 2, frame, frame_length);
     
     // Checkum forever !
     buffer[length - 1] = XBee_driver_compute_checksum(frame, frame_length);

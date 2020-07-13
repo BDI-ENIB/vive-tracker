@@ -20,6 +20,7 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include "project.h"
 #include "USB_commands_manager.h"
 
@@ -43,8 +44,8 @@ USB_commands_manager* USB_commands_manager_create() {
     usb_commands_manager->last_token = NULL;
     usb_commands_manager->command_count = 0;
     
-    //strcpy(usb_commands_manager->delimiter, " ");
-    usb_commands_manager->delimiter = " ";
+    strcpy(usb_commands_manager->delimiter, " ");
+    //usb_commands_manager->delimiter = " ";
     
     // Clear buffer
     usb_commands_manager->buffer[0] = '\0';
@@ -70,8 +71,6 @@ void USB_commands_manager_register_command(USB_commands_manager *usb_commands_ma
 }
 
 void USB_commands_manager_check_commands(USB_commands_manager *usb_commands_manager) {
-    
-    
     char nb_char = 0;
     
     // If we received some packets from the PC
@@ -89,19 +88,19 @@ void USB_commands_manager_check_commands(USB_commands_manager *usb_commands_mana
     // Processing the data
     for(int i = usb_commands_manager->buffer_pos - nb_char; i < usb_commands_manager->buffer_pos; i++)
     {
-            
         char character = USB_Serial_GetChar();
         
         if(character == 0)
             return;
         
-        if(character == '\n') { //end of the command
+        if(character == ';') { //end of the command
+            char temp[10]; // The end character is also a delimiter FOR strtok_r function. 
+            sprintf(temp, "%s%s", usb_commands_manager->delimiter, ";");
             usb_commands_manager->buffer[i] = '\0'; //set the of the string
-            char *command = strtok_r(usb_commands_manager->buffer,usb_commands_manager->delimiter, &(usb_commands_manager->last_token));
+            char *command = strtok_r(usb_commands_manager->buffer, temp, &(usb_commands_manager->last_token));
             command++; //to resole a weird bug where the first char is doubled
             
-            if(command != NULL){ 
-                
+            if(command != NULL) {
                 for(int i = 0; i < usb_commands_manager->command_count; i++) { // For each command in registered commands
                     if (strncmp(command, (usb_commands_manager->callbacks[i]).command ,USB_COMMAND_MANAGER_MAX_COMMAND_LENGTH) == 0) {
                         (*((usb_commands_manager->callbacks[i]).callback_function))();
@@ -119,7 +118,9 @@ void USB_commands_manager_check_commands(USB_commands_manager *usb_commands_mana
 }
 
 char* USB_commands_manager_get_next_token(USB_commands_manager *usb_commands_manager) {
-    return strtok_r(NULL, usb_commands_manager->delimiter, &(usb_commands_manager->last_token));
+    char temp[10]; // The end character is also a delimiter FOR strtok_r function. 
+    sprintf(temp, "%s%s", usb_commands_manager->delimiter, ";");
+    return strtok_r(NULL, temp, &(usb_commands_manager->last_token));
 }
 
 void USB_commands_manager_send_command(USB_commands_manager *usb_commands_manager, char command[USB_COMMAND_MANAGER_MAX_COMMAND_LENGTH + 1],
@@ -130,7 +131,7 @@ void USB_commands_manager_send_command(USB_commands_manager *usb_commands_manage
     CyDelay(1);
     USB_Serial_PutString(args);
     CyDelay(1);
-    USB_Serial_PutString("\n");
+    USB_Serial_PutString(";");
     CyDelay(1);
 }
 

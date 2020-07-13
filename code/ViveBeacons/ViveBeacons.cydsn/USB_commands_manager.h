@@ -40,7 +40,7 @@ struct USB_commands_manager {
     int command_count;
     int buffer_pos;
     char *last_token;
-    char *delimiter;
+    char delimiter[2];
 };
 
 // Public methods

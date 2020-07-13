@@ -21,12 +21,17 @@
 #if !defined(TONNERRE_H)
 #define TONNERRE_H
 
+#include <stdbool.h>
 #include <cytypes.h>
 #include "project.h"
 #include "XBee_driver.h"
 
 #define TONNERRE_MAX_ARG_SIZE 24 // Max argument size for Tonnerre messages
 #define TONNERRE_MAX_MSG_ID 69
+    
+#define TONNERRE_MAX_COMMANDS_MANAGEMENT_SYSTEM_ENTRIES 20
+#define TONNERRE_MAX_COMMANDS_MANAGEMENT_SYSTEM_RETRIES 3
+#define TONNERRE_MAX_COMMANDS_MANAGEMENT_SYSTEM_TIMEOUT 
 
 // Tonnerre message IDs
 // -- Mandatory commands --
@@ -50,8 +55,20 @@
 // Data structure
 typedef struct Tonnerre_callback Tonnerre_callback;
 struct Tonnerre_callback {
-    uint8_t msg_type;
-    void (*callback_function)(uint8_t src_addr, uint8_t buffer[TONNERRE_MAX_ARG_SIZE]);
+    uint8_t command;
+    void (*callback_function)(uint16_t src_addr, uint8_t msg_id, uint8_t args[TONNERRE_MAX_ARG_SIZE]);
+};
+
+typedef struct Tonnerre_commands_management_entry Tonnerre_commands_management_entry;
+struct Tonnerre_commands_management_entry {
+    uint8_t command;
+    uint16_t vive_ID;
+    uint8_t msg_id;
+    
+    uint8_t data[TONNERRE_MAX_ARG_SIZE];
+    uint8_t data_length;
+    
+    bool valid;
 };
 
 typedef struct Tonnerre Tonnerre;
@@ -59,21 +76,24 @@ struct Tonnerre
 {
     XBee_driver *xbee_driver;
     Tonnerre_callback callbacks[TONNERRE_MAX_MSG_ID+1];
+    Tonnerre_commands_management_entry commands_tabs[TONNERRE_MAX_COMMANDS_MANAGEMENT_SYSTEM_ENTRIES];
     uint8_t msg_id; // Incremented for each message sent
 };
 
 // Public methods
 Tonnerre* Tonnerre_create();
 void Tonnerre_init(Tonnerre *tonnerre, XBee_driver *xbee_driver);
+void Tonnerre_check_commands(Tonnerre* tonnerre);
+void Tonnerre_send_command(Tonnerre* tonnerre, uint8_t command, uint16_t vive_ID, uint8_t data[TONNERRE_MAX_ARG_SIZE], uint8_t data_length, bool require_response);
+void Tonnerre_send_response(Tonnerre* tonnerre, uint8_t command, uint16_t vive_ID, uint8_t msg_id, uint8_t data[TONNERRE_MAX_ARG_SIZE], uint8_t data_length);
 
 // Private methods
 void Tonnerre_dispatch(uint8_t *xbee_frame_buffer);
+void Tonnerre_register_callback(Tonnerre* tonnerre, uint8_t msg_type, void (*callback_function)(uint16_t src_addr, uint8_t msg_id, uint8_t args[TONNERRE_MAX_ARG_SIZE]));
 
-#if defined(TONNERRE_HANDLER)
-Tonnerre* tonnerre = NULL;
-#else
-extern Tonnerre* tonnerre;
-#endif
+// """Protected""" methods - Can only be used by Tonnerre or Tonnerre_commands
+int Tonnerre_commands_management_system_get_next_empty_entry(Tonnerre *tonnerre);
+void Tonnerre_commands_management_system_remove_entry(Tonnerre *tonnerre, uint8_t command, uint16_t vive_ID, uint8_t msg_id);
 
 #endif
 
