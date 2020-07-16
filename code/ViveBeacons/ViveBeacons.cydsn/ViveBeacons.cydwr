@@ -340,18 +340,26 @@
   </Group>
   <Group key="Component">
     <Group key="v1">
-      <Data key="cy_boot" value="cy_boot_v5_50" />
-      <Data key="Em_EEPROM_Dynamic" value="Em_EEPROM_Dynamic_v2_0" />
-      <Data key="LIN_Dynamic" value="LIN_Dynamic_v3_40" />
+      <Data key="cy_boot" value="cy_boot_v5_80" />
+      <Data key="Em_EEPROM_Dynamic" value="Em_EEPROM_Dynamic_v2_20" />
+      <Data key="LIN_Dynamic" value="LIN_Dynamic_v5_0" />
     </Group>
   </Group>
   <Data key="DataVersionKey" value="2" />
+  <Group key="DMA">
+    <Data key="02cad408-544e-4846-9087-1b538e2cb9c9" value="0" />
+    <Data key="d47a0afd-78c5-489a-9cc1-68416f95db45/b93c3cac-e072-4606-8580-38dab7d12660" value="1" />
+  </Group>
   <Group key="DWRInstGuidMapping">
     <Group key="Clock">
       <Data key="7ced4b40-2a60-4981-bb57-e6d6f77e91b9" value="VIVE_CLK" />
       <Data key="8ae43e59-28bf-4c3c-a771-f1de9f940c28/7ced4b40-2a60-4981-bb57-e6d6f77e91b9" value="VIVETimeDecoder_1_VIVE_CLK" />
       <Data key="92b11ccc-ba83-41fe-a3c9-aaadfe863203" value="Clock_1" />
       <Data key="93ea4f1e-d125-44cd-9c89-7ab8e2513f15" value="VIVE_AXIS_CLK" />
+    </Group>
+    <Group key="DMA">
+      <Data key="02cad408-544e-4846-9087-1b538e2cb9c9" value="DMA_timing_read" />
+      <Data key="d47a0afd-78c5-489a-9cc1-68416f95db45/b93c3cac-e072-4606-8580-38dab7d12660" value="NeoPixel_1_DMA" />
     </Group>
     <Group key="Pin">
       <Data key="02f2cf2c-2c7a-49df-9246-7a3435c21be3" value="IMU_SCL" />
@@ -364,20 +372,21 @@
       <Data key="17c6e5cd-9c02-4edd-84d9-82d3e2b204ae" value="axis" />
       <Data key="93f625ad-f4d0-46d2-9953-0a1f8ae9f8a7" value="enveloppe_4" />
       <Data key="98ce261d-3a02-475c-bd84-53eed698a776" value="data_pins" />
-      <Data key="264be2d3-9481-494b-8d9c-c1905a45e9cc" value="JUMPER" />
+      <Data key="264be2d3-9481-494b-8d9c-c1905a45e9cc" value="jumper_pins" />
       <Data key="364bc103-1e45-4b75-80fe-382c25da0339" value="enveloppe_7" />
       <Data key="746e783e-1b9c-4345-821f-9a0a25060b47" value="enveloppe_6" />
       <Data key="2245e73a-ccb4-4bf4-9f51-1f6be840d213" value="JUMPER_1" />
       <Data key="22863ebe-a37b-476f-b252-6e49a8c00b12" value="IMU_SDA" />
-      <Data key="1425177d-0d0e-4468-8bcc-e638e5509a9b" value="Rx_1" />
+      <Data key="1425177d-0d0e-4468-8bcc-e638e5509a9b" value="XBEE_DOUT" />
       <Data key="a951bf5b-8f9f-4016-8951-b0afe116553f" value="enveloppe_pins" />
+      <Data key="b88a3e0a-289f-47f4-96f2-69db19fb2acc" value="NEOPIXEL_DATA_PIN" />
       <Data key="beca5e2d-f70f-4900-a4db-7eca1ed3126e/8b77a6c4-10a0-4390-971c-672353e2a49c" value="USB_Serial_Dm" />
       <Data key="beca5e2d-f70f-4900-a4db-7eca1ed3126e/618a72fc-5ddd-4df5-958f-a3d55102db42" value="USB_Serial_Dp" />
       <Data key="c0a8a8b6-02e9-49da-aef1-c7165baec6cb" value="JUMPER_2" />
       <Data key="c7da82f5-1060-4998-88d1-131d74021cfe" value="enveloppe_8" />
       <Data key="dd43c583-c3d5-4ea0-80db-9ed54edd2a7c" value="enveloppe_5" />
       <Data key="e851a3b9-efb8-48be-bbb8-b303b216c393" value="Pin_1" />
-      <Data key="ed092b9b-d398-4703-be89-cebf998501f6" value="Tx_1" />
+      <Data key="ed092b9b-d398-4703-be89-cebf998501f6" value="XBEE_DIN" />
       <Data key="f4beb923-9cc0-47fa-9676-33acc0460612" value="enveloppe_3" />
     </Group>
   </Group>
@@ -3607,6 +3616,11 @@
       </Group>
       <Group key="7">
         <Data key="Port Format" value="12,4" />
+      </Group>
+    </Group>
+    <Group key="b88a3e0a-289f-47f4-96f2-69db19fb2acc">
+      <Group key="0">
+        <Data key="Port Format" value="1,7" />
       </Group>
     </Group>
     <Group key="beca5e2d-f70f-4900-a4db-7eca1ed3126e/8b77a6c4-10a0-4390-971c-672353e2a49c">
