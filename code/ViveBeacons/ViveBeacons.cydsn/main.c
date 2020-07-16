@@ -33,6 +33,8 @@
 #include "position.h"
 #include "main.h"
 
+// Check vive_sensors.h to select the type of sensors that you have
+
 // Global variables
 bool beacon_position_initialized = false;
 bool configured = false;
@@ -89,13 +91,13 @@ int main(void) {
     CyGlobalIntEnable;
     Arsenal_init(arsenal);
     Tonnerre_init(tonnerre, xBee_driver);
-    //CyGlobalIntDisable;
+    CyGlobalIntDisable;
     
     /* VIVE sensors init : VIVE decoders and TS4231 init (It has to wait for light though).*/
     millis_timer_Start(); //for the timeout during init phase
-    //VIVE_sensors_init(vive_sensors);
+    VIVE_sensors_init(vive_sensors);
     //CyGlobalIntEnable;
-    
+    CyGlobalIntEnable;
     /* --- Main loop --- */
     for(;;) {
         Arsenal_check_commands(arsenal);

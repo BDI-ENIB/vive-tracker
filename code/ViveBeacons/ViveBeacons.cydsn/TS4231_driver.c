@@ -206,6 +206,7 @@ bool TS4231_driver_wait_for_light(TS4231_driver* ts4231_driver) {
             if (time0 <= MAX_COUNTER_VALUE-TIMEOUT_LENGTH) { return false; } //waited for too long, counter does only count down
             if (CyPins_ReadPin(ts4231_driver->data_pin) != 0) { //light detected
                 while (true) {
+                    time0 = millis_timer_ReadCounter();
                     if (time0 <= MAX_COUNTER_VALUE-2*TIMEOUT_LENGTH) { return false; } //waited for too long
                     if (CyPins_ReadPin(ts4231_driver->data_pin) == 0) {
                        return true;

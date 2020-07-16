@@ -44,6 +44,8 @@
 
 #define CLK_frequency 7200000 // in Hertz
 
+#define SEKOUR_SENSORS 1 // TS4231_SENSORS
+
 // Enums
 typedef enum Names Names;
 enum Names {STIFF, NIVIDI, PIRNOIR, ARMEN, VIELLE, MILLIER, PETITMINOU, KEREON};

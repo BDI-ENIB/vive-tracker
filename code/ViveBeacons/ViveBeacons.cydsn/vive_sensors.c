@@ -103,15 +103,19 @@ void VIVE_sensors_init(VIVE_sensors *vive_sensors) {
     CyDmaChSetInitialTd(vive_sensors->DMA_timing_read_Chan, vive_sensors->DMA_timing_read_TD[0]);
     
     CyDmaChEnable(vive_sensors->DMA_timing_read_Chan, 1);
-
+    
     // --- TS4231 drivers init ---
     for(int i = 0; i < 8; i++) {
-       
-        if( TS4231_driver_init(vive_sensors->ts4231_drivers[i])) { //timed-out
+       #ifdef TS4231_SENSORS
+            if( TS4231_driver_init(vive_sensors->ts4231_drivers[i])) { //timed-out
+                vive_sensors->usable[i] = true;
+            }
+            else vive_sensors->usable[i] = false;
+        #elif SEKOUR_SENSORS
             vive_sensors->usable[i] = true;
-        }
-        else vive_sensors->usable[i] = false; 
+        #endif
     }
+
 
     // --- Start interrupt ---
     isr_timing_redirect_StartEx(isr_timing_read);
