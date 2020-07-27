@@ -64,6 +64,7 @@ Position_finder* position_finder = NULL;
 XBee_driver* xBee_driver = NULL;
 Arsenal* arsenal = NULL;
 Tonnerre* tonnerre = NULL;
+Neopixel_driver *neopixel_driver = NULL;
 
 int main(void) {
     // Creating handler objects
@@ -72,6 +73,7 @@ int main(void) {
     xBee_driver = XBee_driver_create();
     arsenal = Arsenal_create();
     tonnerre = Tonnerre_create();
+    neopixel_driver = Neopixel_driver_create();
     
     /* --- Tracker initialization --- */
     /* ID decoding */
@@ -96,8 +98,8 @@ int main(void) {
     /* VIVE sensors init : VIVE decoders and TS4231 init (It has to wait for light though).*/
     millis_timer_Start(); //for the timeout during init phase
     VIVE_sensors_init(vive_sensors);
-    //CyGlobalIntEnable;
     CyGlobalIntEnable;
+
     /* --- Main loop --- */
     for(;;) {
         Arsenal_check_commands(arsenal);

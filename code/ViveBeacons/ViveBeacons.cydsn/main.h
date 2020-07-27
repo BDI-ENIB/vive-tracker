@@ -36,6 +36,7 @@
 #include "Arsenal_commands.h"
 #include "Tonnerre.h"
 #include "Tonnerre_commands.h"
+#include "Neopixel_driver.h"
 
 /*
 Position of LEDs in tracker's coordinates (aka relative to its center).
